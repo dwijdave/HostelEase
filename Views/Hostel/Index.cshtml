@@ -1,0 +1,23 @@
+@model List<Hostel>
+@{ ViewData["Title"] = "Hostels"; }
+<div class="page-actions"><div class="text-muted">@Model.Count hostel(s)</div><a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add hostel</a></div>
+<div class="card">
+@if (Model.Any())
+{
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Hostel</th><th>Type</th><th>Rooms</th><th style="min-width:180px">Occupancy</th><th>Status</th><th></th></tr></thead><tbody>
+    @foreach (var h in Model)
+    {
+        <tr><td><div class="fw-semibold">@h.Name</div><div class="small text-muted">@h.Location</div></td><td>@h.Type</td><td>@h.TotalRooms</td>
+            <td><div class="small">@h.OccupiedBeds / @h.TotalBeds beds</div><div class="progress mt-1"><div class="progress-bar" style="width:@h.OccupancyPercent%"></div></div></td>
+            <td><partial name="_StatusBadge" model="@(h.IsActive ? "Active" : "Inactive")" /></td>
+            <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-secondary" asp-action="Blocks" asp-route-hostelId="@h.HostelID">Blocks</a>
+                <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@h.HostelID"><i class="bi bi-pencil"></i></a>
+                <form asp-action="SetActive" method="post" class="d-inline" onsubmit="return confirm('@(h.IsActive ? "Deactivate" : "Activate") @h.Name?');">
+                    <input type="hidden" name="id" value="@h.HostelID" /><input type="hidden" name="active" value="@((!h.IsActive).ToString().ToLower())" />
+                    <button class="btn btn-sm @(h.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(h.IsActive ? "Deactivate" : "Activate")</button></form></td></tr>
+    }
+    </tbody></table></div>
+}
+else { <div class="empty-state"><i class="bi bi-building"></i>No hostels yet.</div> }
+</div>

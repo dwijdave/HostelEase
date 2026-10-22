@@ -1,0 +1,12 @@
+@model Complaint
+@{ ViewData["Title"] = "Respond to complaint"; }
+<div class="card" style="max-width:720px"><div class="card-body">
+    <div class="d-flex justify-content-between"><div><div class="fw-bold">@Model.StudentName</div><div class="small text-muted">@Model.Category &middot; @Model.DateSubmitted.ToString("dd MMM yyyy, HH:mm")</div></div><partial name="_StatusBadge" model="Model.ResolutionStatus" /></div>
+    <p class="mt-3 p-3 bg-light rounded">@Model.Description</p>
+    <form asp-action="Respond" method="post">
+        <input type="hidden" name="id" value="@Model.ComplaintID" />
+        <div class="mb-3"><label class="form-label">Status</label><select name="resolutionStatus" class="form-select">@foreach (var s in Complaint.Statuses) { <option value="@s" selected="@(Model.ResolutionStatus == s)">@s</option> }</select></div>
+        <div class="mb-3"><label class="form-label">Response to the student</label><textarea name="adminResponse" class="form-control" rows="4" maxlength="1000">@Model.AdminResponse</textarea></div>
+        <button class="btn btn-primary">Save</button> <a class="btn btn-light" asp-action="Index">Back</a>
+    </form>
+</div></div>

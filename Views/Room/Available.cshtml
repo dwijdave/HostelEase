@@ -1,0 +1,26 @@
+@model List<Room>
+@{ ViewData["Title"] = "Available rooms"; bool isStudent = User.IsInRole("Student"); }
+<div class="page-actions">
+    <form method="get" class="d-flex flex-wrap gap-2 filter-bar">
+        <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Search room, block or hostel" />
+        <select name="hostelId" class="form-select" asp-items="@((SelectList)ViewBag.Hostels)"><option value="">All hostels</option></select>
+        <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Search</button><a class="btn btn-light" asp-action="Available">Clear</a>
+    </form>
+    <div class="text-muted">@Model.Count room(s) with free beds</div>
+</div>
+@if (Model.Any())
+{
+    <div class="row g-3">
+    @foreach (var r in Model)
+    {
+        int pct = r.Occupied * 100 / r.Capacity;
+        <div class="col-md-6 col-xl-4"><div class="card h-100"><div class="card-body">
+            <div class="d-flex justify-content-between"><div><div class="fs-5 fw-bold">Room @r.RoomNumber</div><div class="text-muted small">@r.HostelName &middot; @r.BlockName</div></div><span class="badge-status st-Available">@r.FreeBeds free</span></div>
+            <div class="small mt-3 d-flex justify-content-between"><span>@r.Occupied of @r.Capacity beds taken</span><span>@pct%</span></div>
+            <div class="progress mt-1"><div class="progress-bar bg-success" style="width:@pct%"></div></div>
+            @if (isStudent) { <a class="btn btn-primary btn-sm mt-3" asp-controller="Allocation" asp-action="Apply" asp-route-roomId="@r.RoomID">Request this room</a> }
+        </div></div></div>
+    }
+    </div>
+}
+else { <div class="card"><div class="empty-state"><i class="bi bi-door-closed"></i>No rooms with free beds right now.</div></div> }

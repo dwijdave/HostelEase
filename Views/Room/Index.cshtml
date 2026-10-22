@@ -1,0 +1,32 @@
+@model List<Room>
+@{ ViewData["Title"] = "Rooms"; string[] statuses = ViewBag.Statuses; string av = ViewBag.Availability, st = ViewBag.Status; }
+<div class="page-actions">
+    <form method="get" class="d-flex flex-wrap gap-2 filter-bar">
+        <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Room, block or hostel" />
+        <select name="hostelId" class="form-select" asp-items="@((SelectList)ViewBag.Hostels)"><option value="">All hostels</option></select>
+        <select name="availability" class="form-select"><option value="">Any availability</option><option value="available" selected="@(av == "available")">Has free beds</option><option value="full" selected="@(av == "full")">Full</option></select>
+        <select name="status" class="form-select"><option value="">Any status</option>@foreach (var s in statuses) { <option value="@s" selected="@(st == s)">@s</option> }</select>
+        <button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button><a class="btn btn-light" asp-action="Index">Clear</a>
+    </form>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add room</a>
+</div>
+<div class="card">
+@if (Model.Any())
+{
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Room</th><th>Hostel / Block</th><th>Beds</th><th style="min-width:150px">Occupancy</th><th>Status</th><th></th></tr></thead><tbody>
+    @foreach (var r in Model)
+    {
+        int pct = r.Capacity == 0 ? 0 : r.Occupied * 100 / r.Capacity;
+        <tr><td class="fw-semibold">@r.RoomNumber</td><td>@r.HostelName<div class="small text-muted">@r.BlockName</div></td><td>@r.Capacity</td>
+            <td><div class="small">@r.Occupied / @r.Capacity occupied</div><div class="progress mt-1"><div class="progress-bar @(pct >= 100 ? "bg-danger" : "bg-success")" style="width:@pct%"></div></div></td>
+            <td><partial name="_StatusBadge" model="r.AvailabilityText" /></td>
+            <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@r.RoomID"><i class="bi bi-pencil"></i></a>
+                @if (r.Status != "Inactive")
+                {
+                    <form asp-action="Deactivate" method="post" class="d-inline" onsubmit="return confirm('Deactivate room @r.RoomNumber?');"><input type="hidden" name="id" value="@r.RoomID" /><button class="btn btn-sm btn-outline-danger">Deactivate</button></form>
+                }</td></tr>
+    }
+    </tbody></table></div>
+}
+else { <div class="empty-state"><i class="bi bi-door-open"></i>No rooms match. Try clearing the filters.</div> }
+</div>

@@ -1,0 +1,11 @@
+@model CreateAdminViewModel
+@{ ViewData["Title"] = "Add administrator"; }
+<div class="card" style="max-width:560px"><div class="card-body">
+    <p class="text-muted">Create a new administrator account. Only administrators can do this.</p>
+    <form asp-action="CreateAdmin" method="post" novalidate>
+        <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+        <button class="btn btn-primary">Create administrator</button> <a class="btn btn-light" asp-controller="Dashboard" asp-action="Index">Cancel</a>
+    </form>
+</div></div>

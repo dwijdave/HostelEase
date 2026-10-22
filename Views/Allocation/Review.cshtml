@@ -1,0 +1,42 @@
+@model ReviewViewModel
+@{ ViewData["Title"] = "Review request #" + Model.Request.RequestID; var r = Model.Request; var s = Model.Student; bool pending = r.Status == "Pending"; }
+<div class="row g-3">
+<div class="col-lg-5"><div class="card h-100"><div class="card-header">Student &amp; request</div><div class="card-body">
+    <div class="fs-5 fw-bold">@s.FullName</div><div class="text-muted mb-3">@s.StudentNumber &middot; @s.Email</div>
+    <dl class="row mb-0 small">
+        <dt class="col-5">Course</dt><dd class="col-7">@s.Course (Sem @s.Semester)</dd>
+        <dt class="col-5">Contact</dt><dd class="col-7">@(s.Contact ?? "-")</dd>
+        <dt class="col-5">Current room</dt><dd class="col-7">@(s.CurrentRoom ?? "None")</dd>
+        <dt class="col-5">Preference</dt><dd class="col-7">@(r.PreferredRoomLabel ?? r.PreferredHostelName ?? "No preference")</dd>
+        <dt class="col-5">Submitted</dt><dd class="col-7">@r.RequestDate.ToString("dd MMM yyyy, HH:mm")</dd>
+        <dt class="col-5">Status</dt><dd class="col-7"><partial name="_StatusBadge" model="r.Status" /></dd>
+        @if (r.ReviewedDate.HasValue) { <dt class="col-5">Decided</dt><dd class="col-7">@r.ReviewedDate.Value.ToString("dd MMM yyyy, HH:mm")</dd> }
+        @if (!string.IsNullOrEmpty(r.AdminRemarks)) { <dt class="col-5">Remarks</dt><dd class="col-7">@r.AdminRemarks</dd> }
+    </dl>
+    @if (!s.IsActive) { <div class="alert alert-warning mt-3 mb-0 small">This student account is deactivated.</div> }
+</div></div></div>
+<div class="col-lg-7"><div class="card h-100"><div class="card-header">Decision</div><div class="card-body">
+@if (!pending) { <div class="empty-state"><i class="bi bi-lock"></i>This request has already been @r.Status.ToLower().</div> }
+else
+{
+    <form asp-action="Approve" method="post" id="decision">
+        <input type="hidden" name="id" value="@r.RequestID" />
+        <div class="mb-3"><label class="form-label">Room to allocate</label>
+        @if (Model.Rooms.Any())
+        {
+            <select name="roomId" class="form-select">
+                @foreach (var room in Model.Rooms) { <option value="@room.RoomID" selected="@(room.RoomID == Model.SelectedRoomId)">@room.Label &mdash; @room.FreeBeds of @room.Capacity free@(room.RoomID == r.PreferredRoomID ? " (requested)" : "")</option> }
+            </select>
+        }
+        else { <div class="alert alert-warning mb-0">No rooms have free beds. You can only reject the request for now.</div> }
+        </div>
+        <div class="mb-3"><label class="form-label">Remarks (shown to the student)</label><textarea name="remarks" class="form-control" rows="3" maxlength="500"></textarea></div>
+        <div class="d-flex gap-2">
+            @if (Model.Rooms.Any()) { <button class="btn btn-success" onclick="return confirm('Approve this request and allocate the selected room?');"><i class="bi bi-check-lg"></i> Approve &amp; allocate</button> }
+            <button class="btn btn-outline-danger" asp-action="Reject" onclick="return confirm('Reject this request?');"><i class="bi bi-x-lg"></i> Reject</button>
+            <a class="btn btn-light ms-auto" asp-action="Index">Back</a>
+        </div>
+    </form>
+}
+</div></div></div>
+</div>

@@ -1,0 +1,61 @@
+@model AdminDashboardViewModel
+@{ ViewData["Title"] = "Administrator dashboard"; }
+<div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3"><div class="card stat-card"><div class="icon bg-soft-primary"><i class="bi bi-door-closed"></i></div><div><div class="value">@Model.TotalRooms</div><div class="label">Total rooms</div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card stat-card"><div class="icon bg-soft-danger"><i class="bi bi-person-fill-lock"></i></div><div><div class="value">@Model.OccupiedRooms</div><div class="label">Occupied rooms</div></div></div></div>
+    <div class="col-6 col-xl-3"><div class="card stat-card"><div class="icon bg-soft-success"><i class="bi bi-door-open"></i></div><div><div class="value">@Model.VacantRooms</div><div class="label">Vacant rooms</div></div></div></div>
+    <div class="col-6 col-xl-3"><a class="text-decoration-none text-reset" asp-controller="Allocation" asp-action="Index" asp-route-status="Pending"><div class="card stat-card"><div class="icon bg-soft-warning"><i class="bi bi-hourglass-split"></i></div><div><div class="value">@Model.PendingRequests</div><div class="label">Pending requests</div></div></div></a></div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-7">
+        <div class="card h-100"><div class="card-header">Bed occupancy by hostel</div><div class="card-body">
+            <div class="d-flex justify-content-between small mb-1"><span class="fw-semibold">All hostels</span><span>@Model.OccupiedBeds / @Model.TotalBeds beds (@Model.OccupancyPercent%)</span></div>
+            <div class="progress mb-4"><div class="progress-bar bg-primary" style="width:@Model.OccupancyPercent%"></div></div>
+            @foreach (var h in Model.Occupancy)
+            {
+                var color = h.Percent >= 90 ? "bg-danger" : h.Percent >= 60 ? "bg-warning" : "bg-success";
+                <div class="d-flex justify-content-between small mb-1"><span>@h.Hostel</span><span class="text-muted">@h.OccupiedBeds / @h.TotalBeds</span></div>
+                <div class="progress mb-3"><div class="progress-bar @color" style="width:@h.Percent%"></div></div>
+            }
+            @if (!Model.Occupancy.Any()) { <div class="empty-state"><i class="bi bi-building"></i>No hostels yet. <a asp-controller="Hostel" asp-action="Create">Add one</a>.</div> }
+        </div></div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card h-100"><div class="card-header">Quick links</div><div class="card-body"><div class="row g-2">
+            <div class="col-6"><a class="quick-link" asp-controller="Student" asp-action="Index"><i class="bi bi-people"></i>Students <span class="badge text-bg-light ms-auto">@Model.TotalStudents</span></a></div>
+            <div class="col-6"><a class="quick-link" asp-controller="Hostel" asp-action="Index"><i class="bi bi-building"></i>Hostels</a></div>
+            <div class="col-6"><a class="quick-link" asp-controller="Hostel" asp-action="Blocks"><i class="bi bi-grid-3x3-gap"></i>Blocks</a></div>
+            <div class="col-6"><a class="quick-link" asp-controller="Room" asp-action="Index"><i class="bi bi-door-open"></i>Rooms</a></div>
+            <div class="col-6"><a class="quick-link" asp-controller="Allocation" asp-action="Index"><i class="bi bi-inbox"></i>Requests</a></div>
+            <div class="col-6"><a class="quick-link" asp-controller="Complaint" asp-action="Index"><i class="bi bi-chat-left-text"></i>Complaints <span class="badge text-bg-warning ms-auto">@Model.OpenComplaints</span></a></div>
+        </div></div></div>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-7"><div class="card"><div class="card-header d-flex justify-content-between">Recent allocation requests <a class="small fw-normal" asp-controller="Allocation" asp-action="Index">View all</a></div>
+        @if (Model.RecentRequests.Any())
+        {
+            <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Student</th><th>Preference</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>
+            @foreach (var r in Model.RecentRequests)
+            {
+                <tr><td>@r.StudentName<div class="small text-muted">@r.StudentNumber</div></td><td class="small">@(r.PreferredRoomLabel ?? r.PreferredHostelName ?? "No preference")</td><td class="small">@r.RequestDate.ToString("dd MMM yyyy")</td>
+                    <td><partial name="_StatusBadge" model="r.Status" /></td>
+                    <td class="text-end">@if (r.Status == "Pending") { <a class="btn btn-sm btn-primary" asp-controller="Allocation" asp-action="Review" asp-route-id="@r.RequestID">Review</a> }</td></tr>
+            }
+            </tbody></table></div>
+        }
+        else { <div class="empty-state"><i class="bi bi-inbox"></i>No requests yet.</div> }
+    </div></div>
+    <div class="col-lg-5"><div class="card"><div class="card-header d-flex justify-content-between">Recent registrations <a class="small fw-normal" asp-controller="Student" asp-action="Index">View all</a></div>
+        @if (Model.RecentStudents.Any())
+        {
+            <ul class="list-group list-group-flush">
+            @foreach (var s in Model.RecentStudents)
+            {
+                <li class="list-group-item d-flex justify-content-between"><div>@s.FullName<div class="small text-muted">@s.StudentNumber &middot; @s.Course</div></div><span class="small text-muted">@s.CreatedAt.ToString("dd MMM")</span></li>
+            }
+            </ul>
+        }
+        else { <div class="empty-state"><i class="bi bi-people"></i>No students yet.</div> }
+    </div></div>
+</div>

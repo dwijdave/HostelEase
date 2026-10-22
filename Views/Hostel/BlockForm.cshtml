@@ -1,0 +1,10 @@
+@model Block
+@{ ViewData["Title"] = Model.BlockID == 0 ? "Add block" : "Edit block"; }
+<div class="card" style="max-width:560px"><div class="card-body">
+<form asp-action="@(Model.BlockID == 0 ? "CreateBlock" : "EditBlock")" method="post" novalidate>
+    <input type="hidden" asp-for="BlockID" />
+    <div class="mb-3"><label asp-for="HostelID" class="form-label"></label>
+        <select asp-for="HostelID" class="form-select" asp-items="@((SelectList)ViewBag.Hostels)"><option value="0">Select a hostel...</option></select><span asp-validation-for="HostelID" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="BlockName" class="form-label"></label><input asp-for="BlockName" class="form-control" placeholder="e.g. Block A" /><span asp-validation-for="BlockName" class="text-danger"></span></div>
+    <button class="btn btn-primary">Save</button> <a class="btn btn-light" asp-action="Blocks" asp-route-hostelId="@(Model.HostelID == 0 ? null : Model.HostelID)">Cancel</a>
+</form></div></div>

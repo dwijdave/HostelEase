@@ -1,0 +1,23 @@
+@model List<AllocationRequest>
+@{ ViewData["Title"] = "Allocation requests"; string status = ViewBag.Status; string[] all = { "Pending", "Approved", "Rejected", "Cancelled" }; }
+<div class="page-actions">
+    <form method="get" class="d-flex flex-wrap gap-2 filter-bar">
+        <input name="q" value="@ViewBag.Q" class="form-control" placeholder="Student name or ID" />
+        <select name="status" class="form-select"><option value="">All statuses</option>@foreach (var s in all) { <option value="@s" selected="@(status == s)">@s</option> }</select>
+        <button class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filter</button><a class="btn btn-light" asp-action="Index">Clear</a>
+    </form>
+</div>
+<div class="card">
+@if (Model.Any())
+{
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>#</th><th>Student</th><th>Preference</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody>
+    @foreach (var r in Model)
+    {
+        <tr><td>@r.RequestID</td><td class="fw-semibold">@r.StudentName<div class="small text-muted fw-normal">@r.StudentNumber</div></td><td class="small">@(r.PreferredRoomLabel ?? r.PreferredHostelName ?? "No preference")</td>
+            <td class="small">@r.RequestDate.ToString("dd MMM yyyy")</td><td><partial name="_StatusBadge" model="r.Status" /></td>
+            <td class="text-end"><a class="btn btn-sm @(r.Status == "Pending" ? "btn-primary" : "btn-outline-secondary")" asp-action="Review" asp-route-id="@r.RequestID">@(r.Status == "Pending" ? "Review" : "View")</a></td></tr>
+    }
+    </tbody></table></div>
+}
+else { <div class="empty-state"><i class="bi bi-inbox"></i>No requests found.</div> }
+</div>

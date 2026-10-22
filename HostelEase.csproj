@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Visual Studio 2026 with only the .NET 10 SDK installed? Change net8.0 to net10.0 -->
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>HostelEase</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ADO.NET provider for SQL Server -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The SQL script is embedded so the app can create/upgrade the database by itself on first run -->
+    <EmbeddedResource Include="Database\01_Create_HostelEase.sql" LogicalName="HostelEase.schema.sql" />
+    <None Update="Database\**" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+</Project>

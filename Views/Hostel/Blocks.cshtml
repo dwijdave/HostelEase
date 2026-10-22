@@ -1,0 +1,27 @@
+@model List<Block>
+@{ ViewData["Title"] = "Blocks"; int? hostelId = ViewBag.HostelId; }
+<div class="page-actions">
+    <form method="get" class="d-flex gap-2 filter-bar">
+        <select name="hostelId" class="form-select" asp-items="@((SelectList)ViewBag.Hostels)"><option value="">All hostels</option></select>
+        <button class="btn btn-outline-primary">Filter</button>
+    </form>
+    <a class="btn btn-primary" asp-action="CreateBlock" asp-route-hostelId="@hostelId"><i class="bi bi-plus-lg"></i> Add block</a>
+</div>
+<div class="card">
+@if (Model.Any())
+{
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Block</th><th>Hostel</th><th>Rooms</th><th>Status</th><th></th></tr></thead><tbody>
+    @foreach (var b in Model)
+    {
+        <tr><td class="fw-semibold">@b.BlockName</td><td>@b.HostelName</td><td>@b.RoomCount</td><td><partial name="_StatusBadge" model="@(b.IsActive ? "Active" : "Inactive")" /></td>
+            <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-secondary" asp-controller="Room" asp-action="Create" asp-route-blockId="@b.BlockID">Add room</a>
+                <a class="btn btn-sm btn-outline-primary" asp-action="EditBlock" asp-route-id="@b.BlockID"><i class="bi bi-pencil"></i></a>
+                <form asp-action="SetBlockActive" method="post" class="d-inline" onsubmit="return confirm('@(b.IsActive ? "Deactivate" : "Activate") @b.BlockName?');">
+                    <input type="hidden" name="id" value="@b.BlockID" /><input type="hidden" name="active" value="@((!b.IsActive).ToString().ToLower())" />
+                    <button class="btn btn-sm @(b.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(b.IsActive ? "Deactivate" : "Activate")</button></form></td></tr>
+    }
+    </tbody></table></div>
+}
+else { <div class="empty-state"><i class="bi bi-grid-3x3-gap"></i>No blocks found.</div> }
+</div>

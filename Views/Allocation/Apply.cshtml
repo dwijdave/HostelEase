@@ -1,0 +1,18 @@
+@model RequestFormViewModel
+@{
+    ViewData["Title"] = "Request a room";
+    var hostels = (List<Hostel>)ViewBag.Hostels; var rooms = (List<Room>)ViewBag.Rooms;
+}
+<div class="card" style="max-width:680px"><div class="card-body">
+    <p class="text-muted">Choose a preferred hostel and/or a specific room. Both are optional; the hostel office makes the final decision.</p>
+    <form asp-action="Apply" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="mb-3"><label asp-for="PreferredHostelId" class="form-label">Preferred hostel</label>
+            <select asp-for="PreferredHostelId" class="form-select"><option value="">No preference</option>@foreach (var h in hostels) { <option value="@h.HostelID" selected="@(Model.PreferredHostelId == h.HostelID)">@h.Name (@h.Type)</option> }</select></div>
+        <div class="mb-3"><label asp-for="PreferredRoomId" class="form-label">Preferred room</label>
+            <select asp-for="PreferredRoomId" class="form-select"><option value="">No preference</option>
+                @foreach (var r in rooms) { <option value="@r.RoomID" data-hostel="@r.HostelID" selected="@(Model.PreferredRoomId == r.RoomID)">@r.Label (@r.FreeBeds free)</option> }</select>
+            <span asp-validation-for="PreferredRoomId" class="text-danger"></span></div>
+        <button class="btn btn-primary" onclick="return confirm('Submit this room request?');">Submit request</button> <a class="btn btn-light" asp-action="My">Cancel</a>
+    </form>
+</div></div>

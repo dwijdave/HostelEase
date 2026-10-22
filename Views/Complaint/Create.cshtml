@@ -1,0 +1,9 @@
+@model Complaint
+@{ ViewData["Title"] = "Submit a complaint"; }
+<div class="card" style="max-width:680px"><div class="card-body">
+<form asp-action="Create" method="post" novalidate>
+    <div class="mb-3"><label asp-for="Category" class="form-label"></label>
+        <select asp-for="Category" class="form-select" asp-items="@(Complaint.Categories.Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(c, c)))"><option value="">Select a category...</option></select><span asp-validation-for="Category" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="5" maxlength="1000"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <button class="btn btn-primary">Submit complaint</button> <a class="btn btn-light" asp-action="My">Cancel</a>
+</form></div></div>

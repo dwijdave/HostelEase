@@ -1,0 +1,10 @@
+@model Hostel
+@{ ViewData["Title"] = Model.HostelID == 0 ? "Add hostel" : "Edit hostel"; string[] types = ViewBag.Types; }
+<div class="card" style="max-width:640px"><div class="card-body">
+<form asp-action="@(Model.HostelID == 0 ? "Create" : "Edit")" method="post" novalidate>
+    <input type="hidden" asp-for="HostelID" />
+    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Location" class="form-label"></label><input asp-for="Location" class="form-control" /><span asp-validation-for="Location" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Type" class="form-label"></label><select asp-for="Type" class="form-select" asp-items="@(types.Select(t => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(t, t)))"></select><span asp-validation-for="Type" class="text-danger"></span></div>
+    <button class="btn btn-primary">Save</button> <a class="btn btn-light" asp-action="Index">Cancel</a>
+</form></div></div>

@@ -1,0 +1,34 @@
+@model ReportsViewModel
+@{ ViewData["Title"] = "Reports"; int totalReq = Model.RequestCounts.Values.Sum(); }
+<div class="page-actions"><div class="text-muted">Summary of occupancy, requests and complaints.</div>
+    <div class="d-flex gap-2"><a class="btn btn-outline-secondary" asp-action="ExportStudents"><i class="bi bi-download"></i> Students CSV</a><a class="btn btn-outline-secondary" asp-action="ExportAllocations"><i class="bi bi-download"></i> Allocations CSV</a></div></div>
+<div class="row g-3 mb-3">
+    <div class="col-md-4"><div class="card stat-card"><div class="icon bg-soft-primary"><i class="bi bi-people"></i></div><div><div class="value">@Model.TotalStudents</div><div class="label">Active students</div></div></div></div>
+    <div class="col-md-4"><div class="card stat-card"><div class="icon bg-soft-success"><i class="bi bi-key"></i></div><div><div class="value">@Model.ActiveAllocations</div><div class="label">Active allocations</div></div></div></div>
+    <div class="col-md-4"><div class="card stat-card"><div class="icon bg-soft-secondary"><i class="bi bi-archive"></i></div><div><div class="value">@Model.EndedAllocations</div><div class="label">Past allocations</div></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Occupancy by hostel</div><div class="card-body">
+        @foreach (var h in Model.Occupancy)
+        {
+            <div class="d-flex justify-content-between small mb-1"><span>@h.Hostel</span><span class="text-muted">@h.OccupiedBeds / @h.TotalBeds (@h.Percent%)</span></div>
+            <div class="progress mb-3"><div class="progress-bar @(h.Percent >= 90 ? "bg-danger" : h.Percent >= 60 ? "bg-warning" : "bg-success")" style="width:@h.Percent%"></div></div>
+        }
+        @if (!Model.Occupancy.Any()) { <div class="empty-state">No data yet.</div> }
+    </div></div></div>
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Requests by status (@totalReq total)</div><div class="card-body">
+        @foreach (var kv in Model.RequestCounts)
+        {
+            int pct = totalReq == 0 ? 0 : kv.Value * 100 / totalReq;
+            <div class="d-flex justify-content-between small mb-1"><partial name="_StatusBadge" model="kv.Key" /><span>@kv.Value</span></div>
+            <div class="progress mb-3"><div class="progress-bar @(kv.Key == "Approved" ? "bg-success" : kv.Key == "Pending" ? "bg-warning" : kv.Key == "Rejected" ? "bg-danger" : "bg-secondary")" style="width:@pct%"></div></div>
+        }
+    </div></div></div>
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Complaints by status</div><ul class="list-group list-group-flush">
+        @foreach (var kv in Model.ComplaintCounts) { <li class="list-group-item d-flex justify-content-between"><partial name="_StatusBadge" model="kv.Key" /><b>@kv.Value</b></li> }
+    </ul></div></div>
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Complaints by category</div><ul class="list-group list-group-flush">
+        @foreach (var kv in Model.ComplaintCategories) { <li class="list-group-item d-flex justify-content-between"><span>@kv.Key</span><b>@kv.Value</b></li> }
+        @if (!Model.ComplaintCategories.Any()) { <li class="list-group-item text-muted">No complaints recorded.</li> }
+    </ul></div></div>
+</div>

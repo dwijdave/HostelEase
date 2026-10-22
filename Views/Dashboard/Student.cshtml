@@ -1,0 +1,42 @@
+@model StudentDashboardViewModel
+@{
+    ViewData["Title"] = "My dashboard";
+    var latest = Model.LatestRequest;
+}
+<div class="mb-3"><h4 class="mb-0">Hello, @Model.Student?.FullName</h4><div class="text-muted">@Model.Student?.Course &middot; Semester @Model.Student?.Semester</div></div>
+<div class="row g-3 mb-3">
+    <div class="col-md-4"><div class="card stat-card"><div class="icon @(Model.Current != null ? "bg-soft-success" : "bg-soft-secondary")"><i class="bi bi-house-door"></i></div><div><div class="value fs-5">@(Model.Current != null ? "Allocated" : "Not allocated")</div><div class="label">Room allocation status</div></div></div></div>
+    <div class="col-md-4"><div class="card stat-card"><div class="icon bg-soft-primary"><i class="bi bi-send"></i></div><div><div class="value">@Model.TotalRequests</div><div class="label">Total requests</div></div></div></div>
+    <div class="col-md-4"><div class="card stat-card"><div class="icon bg-soft-warning"><i class="bi bi-hourglass-split"></i></div><div><div class="value">@Model.PendingRequests</div><div class="label">Pending requests</div></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-7">
+        @if (Model.Current != null)
+        {
+            <div class="card border-success mb-3"><div class="card-header text-success"><i class="bi bi-check-circle-fill me-1"></i>Your room</div><div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4"><div class="text-muted small">Hostel</div><div class="fw-semibold">@Model.Current.HostelName</div></div>
+                    <div class="col-sm-4"><div class="text-muted small">Block</div><div class="fw-semibold">@Model.Current.BlockName</div></div>
+                    <div class="col-sm-4"><div class="text-muted small">Room</div><div class="fw-semibold">@Model.Current.RoomNumber</div></div>
+                </div>
+                <div class="text-muted small mt-2">Allocated on @Model.Current.AllocationDate.ToString("dd MMM yyyy")</div>
+            </div></div>
+        }
+        else if (latest != null)
+        {
+            <div class="card mb-3"><div class="card-header">Latest request</div><div class="card-body">
+                <div class="d-flex justify-content-between"><div>@(latest.PreferredRoomLabel ?? latest.PreferredHostelName ?? "No preference")<div class="small text-muted">Submitted @latest.RequestDate.ToString("dd MMM yyyy")</div></div><partial name="_StatusBadge" model="latest.Status" /></div>
+                @if (!string.IsNullOrEmpty(latest.AdminRemarks)) { <div class="alert alert-light border mt-3 mb-0 small"><b>Administrator remarks:</b> @latest.AdminRemarks</div> }
+            </div></div>
+        }
+        else
+        {
+            <div class="card mb-3"><div class="card-body empty-state"><i class="bi bi-door-open"></i>You have no room yet. Browse available rooms and send a request.<div class="mt-3"><a class="btn btn-primary" asp-controller="Allocation" asp-action="Apply">Request a room</a></div></div></div>
+        }
+    </div>
+    <div class="col-lg-5"><div class="card"><div class="card-header">Quick actions</div><div class="card-body d-grid gap-2">
+        <a class="quick-link" asp-controller="Room" asp-action="Available"><i class="bi bi-search"></i>Browse available rooms</a>
+        <a class="quick-link" asp-controller="Allocation" asp-action="My"><i class="bi bi-clock-history"></i>Track my allocation request</a>
+        <a class="quick-link" asp-controller="Complaint" asp-action="Create"><i class="bi bi-chat-left-text"></i>Submit a complaint @if (Model.OpenComplaints > 0) { <span class="badge text-bg-warning ms-auto">@Model.OpenComplaints open</span> }</a>
+    </div></div></div>
+</div>

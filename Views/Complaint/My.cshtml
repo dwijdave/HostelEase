@@ -1,0 +1,15 @@
+@model List<Complaint>
+@{ ViewData["Title"] = "My complaints"; }
+<div class="page-actions"><div class="text-muted">@Model.Count complaint(s)</div><a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> New complaint</a></div>
+@if (Model.Any())
+{
+    foreach (var c in Model)
+    {
+        <div class="card mb-3"><div class="card-body">
+            <div class="d-flex justify-content-between"><div class="fw-semibold">@c.Category <span class="text-muted fw-normal small">&middot; @c.DateSubmitted.ToString("dd MMM yyyy")</span></div><partial name="_StatusBadge" model="c.ResolutionStatus" /></div>
+            <p class="mt-2 mb-0">@c.Description</p>
+            @if (!string.IsNullOrEmpty(c.AdminResponse)) { <div class="alert alert-light border mt-3 mb-0 small"><b>Response:</b> @c.AdminResponse</div> }
+        </div></div>
+    }
+}
+else { <div class="card"><div class="empty-state"><i class="bi bi-chat-left-text"></i>You have not submitted any complaints.</div></div> }

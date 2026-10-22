@@ -1,0 +1,17 @@
+@model Student
+@{ ViewData["Title"] = "My profile"; }
+<div class="card" style="max-width:720px"><div class="card-body">
+    <div class="row g-3 mb-3">
+        <div class="col-md-6"><div class="text-muted small">Student ID</div><div class="fw-semibold">@Model.StudentNumber</div></div>
+        <div class="col-md-6"><div class="text-muted small">Email</div><div class="fw-semibold">@Model.Email</div></div>
+    </div>
+    <form asp-action="Profile" method="post" novalidate>
+        <div class="row g-3">
+            <div class="col-12"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger"></span></div>
+            <div class="col-md-8"><label asp-for="Course" class="form-label"></label><input asp-for="Course" class="form-control" /><span asp-validation-for="Course" class="text-danger"></span></div>
+            <div class="col-md-4"><label asp-for="Semester" class="form-label"></label><input asp-for="Semester" type="number" min="1" max="12" class="form-control" /><span asp-validation-for="Semester" class="text-danger"></span></div>
+            <div class="col-12"><label asp-for="Contact" class="form-label"></label><input asp-for="Contact" class="form-control" /><span asp-validation-for="Contact" class="text-danger"></span></div>
+        </div>
+        <button class="btn btn-primary mt-3">Save changes</button>
+    </form>
+</div></div>
